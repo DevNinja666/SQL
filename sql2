@@ -1,0 +1,74 @@
+CREATE DATABASE AcademyDB3;
+GO
+
+USE AcademyDB3;
+GO
+
+CREATE TABLE FacultyTbl (
+    FacultyKey INT IDENTITY(1,1) PRIMARY KEY,
+    FacultyName NVARCHAR(100) NOT NULL UNIQUE CHECK (LEN(FacultyName) > 0),
+    FacultyDean NVARCHAR(MAX) NOT NULL CHECK (LEN(FacultyDean) > 0)
+);
+
+CREATE TABLE DepartmentTbl (
+    DepartmentKey INT IDENTITY(1,1) PRIMARY KEY,
+    DepartmentBudget MONEY NOT NULL CONSTRAINT DF_Department_Budget DEFAULT 0 CHECK (DepartmentBudget >= 0),
+    DepartmentName NVARCHAR(100) NOT NULL UNIQUE CHECK (LEN(DepartmentName) > 0)
+);
+
+CREATE TABLE GroupTbl (
+    GroupKey INT IDENTITY(1,1) PRIMARY KEY,
+    GroupName NVARCHAR(10) NOT NULL UNIQUE CHECK (LEN(GroupName) > 0),
+    GroupScore INT NOT NULL CHECK (GroupScore BETWEEN 0 AND 5),
+    GroupYear INT NOT NULL CHECK (GroupYear BETWEEN 1 AND 5)
+);
+
+CREATE TABLE TeacherTbl (
+    TeacherKey INT IDENTITY(1,1) PRIMARY KEY,
+    HireDate DATE NOT NULL CHECK (HireDate >= '1990-01-01'),
+    FirstName NVARCHAR(200) NOT NULL CHECK (LEN(FirstName) > 0),
+    LastName NVARCHAR(200) NOT NULL CHECK (LEN(LastName) > 0),
+    JobTitle NVARCHAR(MAX) NOT NULL CHECK (LEN(JobTitle) > 0),
+    BaseSalary MONEY NOT NULL CHECK (BaseSalary > 0),
+    ExtraPay MONEY NOT NULL CONSTRAINT DF_Teacher_ExtraPay DEFAULT 0 CHECK (ExtraPay >= 0),
+    IsProf BIT NOT NULL DEFAULT 0,
+    IsAssist BIT NOT NULL DEFAULT 0
+);
+
+INSERT INTO FacultyTbl (FacultyName, FacultyDean) VALUES ('Computer Science', 'John Smith');
+INSERT INTO FacultyTbl (FacultyName, FacultyDean) VALUES ('Mathematics', 'Alice Brown');
+
+INSERT INTO DepartmentTbl (DepartmentName, DepartmentBudget) VALUES ('Software Development', 15000);
+INSERT INTO DepartmentTbl (DepartmentName, DepartmentBudget) VALUES ('Data Science', 9000);
+
+INSERT INTO GroupTbl (GroupName, GroupScore, GroupYear) VALUES ('CS-01', 4, 3);
+INSERT INTO GroupTbl (GroupName, GroupScore, GroupYear) VALUES ('MATH-01', 3, 5);
+
+INSERT INTO TeacherTbl (LastName, FirstName, JobTitle, BaseSalary, ExtraPay, HireDate, IsProf, IsAssist)
+VALUES ('Ivanov', 'Ivan', 'Professor', 1200, 300, '1995-02-01', 1, 0);
+
+INSERT INTO TeacherTbl (LastName, FirstName, JobTitle, BaseSalary, ExtraPay, HireDate, IsProf, IsAssist)
+VALUES ('Petrov', 'Petr', 'Assistant', 500, 200, '2005-03-01', 0, 1);
+
+INSERT INTO TeacherTbl (LastName, FirstName, JobTitle, BaseSalary, ExtraPay, HireDate, IsProf, IsAssist)
+VALUES ('Sidorov', 'Sidr', 'Lecturer', 800, 150, '1998-05-01', 0, 0);
+
+SELECT DepartmentName, DepartmentBudget, DepartmentKey FROM DepartmentTbl;
+SELECT GroupTbl.GroupName AS [GroupTbl.GroupName], GroupTbl.GroupScore AS [GroupTbl.GroupScore] FROM GroupTbl;
+SELECT LastName, (ExtraPay*100.0/BaseSalary) AS ExtraPercentOfSalary, (ExtraPay*100.0/(BaseSalary+ExtraPay)) AS ExtraPercentOfTotal FROM TeacherTbl;
+SELECT 'The dean of faculty ' + FacultyName + ' is ' + FacultyDean AS Info FROM FacultyTbl;
+SELECT LastName FROM TeacherTbl WHERE IsProf=1 AND BaseSalary>1050;
+SELECT DepartmentName FROM DepartmentTbl WHERE DepartmentBudget<11000 OR DepartmentBudget>25000;
+SELECT FacultyName FROM FacultyTbl WHERE FacultyName<>'Computer Science';
+SELECT LastName, JobTitle FROM TeacherTbl WHERE IsProf=0;
+SELECT LastName, JobTitle, BaseSalary, ExtraPay FROM TeacherTbl WHERE IsAssist=1 AND ExtraPay BETWEEN 160 AND 550;
+SELECT LastName, BaseSalary FROM TeacherTbl WHERE IsAssist=1;
+SELECT LastName, JobTitle FROM TeacherTbl WHERE HireDate<'2000-01-01';
+SELECT DepartmentName AS [Name of Department] FROM DepartmentTbl WHERE DepartmentName<'Software Development';
+SELECT LastName FROM TeacherTbl WHERE IsAssist=1 AND (BaseSalary+ExtraPay)<=1200;
+SELECT GroupName FROM GroupTbl WHERE GroupYear=5 AND GroupScore BETWEEN 2 AND 4;
+SELECT LastName FROM TeacherTbl WHERE IsAssist=1 AND (BaseSalary<550 OR ExtraPay<200);
+
+
+UPDATE TeacherTbl SET ExtraPay = ExtraPay+100 WHERE IsAssist=1;
+DELETE FROM GroupTbl WHERE GroupScore=0;
