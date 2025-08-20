@@ -1,0 +1,43 @@
+CREATE DATABASE AcademyDB2;
+GO
+
+USE AcademyDB2;
+GO
+
+CREATE TABLE FacultyList (
+    FacultyID INT IDENTITY(1,1) PRIMARY KEY,
+    FacultyTitle NVARCHAR(100) NOT NULL UNIQUE
+        CHECK (LEN(FacultyTitle) > 0)
+);
+
+CREATE TABLE DepartmentList (
+    DepartmentID INT IDENTITY(1,1) PRIMARY KEY,
+    DepartmentFinancing MONEY NOT NULL 
+        CONSTRAINT DF_Department_Financing DEFAULT 0
+        CHECK (DepartmentFinancing >= 0),
+    DepartmentTitle NVARCHAR(100) NOT NULL UNIQUE
+        CHECK (LEN(DepartmentTitle) > 0)
+);
+
+CREATE TABLE GroupList (
+    GroupID INT IDENTITY(1,1) PRIMARY KEY,
+    GroupTitle NVARCHAR(10) NOT NULL UNIQUE
+        CHECK (LEN(GroupTitle) > 0),
+    GroupRating INT NOT NULL CHECK (GroupRating BETWEEN 0 AND 5),
+    StudyYear INT NOT NULL CHECK (StudyYear BETWEEN 1 AND 5)
+);
+
+CREATE TABLE TeacherList (
+    TeacherID INT IDENTITY(1,1) PRIMARY KEY,
+    HireDate DATE NOT NULL
+        CHECK (HireDate >= '1990-01-01'),
+    FirstName NVARCHAR(200) NOT NULL 
+        CHECK (LEN(FirstName) > 0),
+    Bonus MONEY NOT NULL 
+        CONSTRAINT DF_Teacher_Bonus DEFAULT 0
+        CHECK (Bonus >= 0),
+    BaseSalary MONEY NOT NULL 
+        CHECK (BaseSalary > 0),
+    LastName NVARCHAR(200) NOT NULL 
+        CHECK (LEN(LastName) > 0)
+);
